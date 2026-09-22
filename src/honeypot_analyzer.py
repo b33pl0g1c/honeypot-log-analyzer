@@ -393,6 +393,11 @@ def counter_table(lines, title, counter, total, top, label, fmt=str):
     lines.append("")
 
 
+def looks_like_ip(value):
+    """True for a dotted IPv4 or an IPv6 address, False for a hashed pseudonym."""
+    return bool(re.fullmatch(r"\d{1,3}(\.\d{1,3}){3}|[0-9A-Fa-f:]*:[0-9A-Fa-f:.]+", value))
+
+
 def when(ts):
     return ts.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -431,6 +436,14 @@ def build_report(events, stats, actors, campaigns, src, top):
     L.append("  Dataset        : CyberLab honeynet dataset, Cowrie SSH honeypot, 2019-05-18 (CC BY 4.0)")
     L.append("                   doi:10.5281/zenodo.3687527 - source IPs are pseudonymized by the dataset")
     L.append("  Classification : TLP:CLEAR")
+    if not looks_like_ip(events[0].ip):
+        L.append("")
+        L.extend(textwrap.wrap(
+            f"  NOTE ON IP ADDRESSES: source IPs appear as hashed IDs (e.g. {attackers[0].ip}), not "
+            "x.x.x.x, because the dataset authors anonymized every address with SHA-256 before "
+            "publishing (IP addresses are personal data under GDPR). Each ID always stands for the "
+            "same real IP, so all counts and rankings are exact. Malware-server addresses inside "
+            "download URLs are real and are listed as IOCs.", WIDTH, subsequent_indent="  "))
 
     # 1 ---------------------------------------------------------------
     section(L, "[1] EXECUTIVE SUMMARY")
@@ -483,6 +496,9 @@ def build_report(events, stats, actors, campaigns, src, top):
 
     # 2 ---------------------------------------------------------------
     section(L, f"[2] TOP {top} ATTACKING IPs (by login attempts)")
+    if not looks_like_ip(attackers[0].ip):
+        L.append("  Source IPs are shown as anonymized IDs (see note at the top of the report).")
+        L.append("")
     rows = []
     for i, a in enumerate(attackers[:top], 1):
         rows.append((i, a.ip, a.country[:14], f"{a.attempts:,}", pct(a.attempts, total_attempts),
@@ -728,6 +744,9 @@ def console_summary(stats, actors, report_path, top=5):
              f"{stats['lines']:,}", f"{stats['parsed']:,}", stats["ignored"], stats["malformed"])
     log.info("%s login attempts from %d IPs", f"{total:,}", len(attackers))
     log.info("")
+    if attackers and not looks_like_ip(attackers[0].ip):
+        log.info("Note: source IPs are anonymized IDs (SHA-256 by the dataset authors), not x.x.x.x")
+        log.info("")
     log.info("TOP ATTACKING IPs           TOP USERNAMES          TOP PASSWORDS")
     ips = [f"{a.ip} {a.attempts:>5,}" for a in attackers[:top]]
     us = [f"{(u or '<empty>')[:14]:<14} {n:>5,}" for u, n in users.most_common(top)]

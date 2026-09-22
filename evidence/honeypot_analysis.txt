@@ -1,12 +1,17 @@
 ====================================================================================================
                          THREAT ACTOR PROFILE  -  SSH HONEYPOT LOG ANALYSIS                         
 ====================================================================================================
-  Generated      : 2026-09-22 18:15:44 (local)
+  Generated      : 2026-09-22 18:22:29 (local)
   Source log     : evidence/sample_data.txt
   Analyzer       : honeypot_analyzer.py v1.0
   Dataset        : CyberLab honeynet dataset, Cowrie SSH honeypot, 2019-05-18 (CC BY 4.0)
                    doi:10.5281/zenodo.3687527 - source IPs are pseudonymized by the dataset
   Classification : TLP:CLEAR
+
+  NOTE ON IP ADDRESSES: source IPs appear as hashed IDs (e.g. c360572c07b8ca33), not x.x.x.x,
+  because the dataset authors anonymized every address with SHA-256 before publishing (IP addresses
+  are personal data under GDPR). Each ID always stands for the same real IP, so all counts and
+  rankings are exact. Malware-server addresses inside download URLs are real and are listed as IOCs.
 
 [1] EXECUTIVE SUMMARY
 ----------------------------------------------------------------------------------------------------
@@ -38,6 +43,8 @@
 
 [2] TOP 10 ATTACKING IPs (by login attempts)
 ----------------------------------------------------------------------------------------------------
+  Source IPs are shown as anonymized IDs (see note at the top of the report).
+
   #   Source IP (pseudonym)  Country  Tries   Share  Sess  Users   OK  First  Last   Behaviour
   --  ---------------------  -------  -----  ------  ----  -----  ---  -----  -----  -----------------
   1   c360572c07b8ca33       Unknown  1,888   26.7%   146     93    6  00:48  21:36  BRUTE
@@ -333,14 +340,14 @@
         3 IPs, 571 login attempts, 793 sessions, countries: Russia
         members: d7554d256b3d7a23, d4f3841f76624b67, 899a269b9683a9bd
   C-05  Same tunnel target ports: dst ports 80
-        3 IPs, 125 login attempts, 157 sessions, countries: Netherlands, Latvia, Czechia
+        3 IPs, 125 login attempts, 157 sessions, countries: Czechia, Netherlands, Latvia
         members: 85a32508793c4a84, 264e3b1322758146, 360ddec1dbfd36ae
   C-06  Malware payload: sha256:4d5d466c37e5e9a7... served from 1 URL(s): hxxp://102.165.48[.]81/njs.sh
         1 IPs, 27 login attempts, 27 sessions, countries: United States
         members: a1d493f45b7c8fd4
   C-07  Identical post-login script: 11 commands, starts 'uname -a'
-        10 IPs, 11 login attempts, 11 sessions, countries: United States, Mauritius, Canada, France
-        members: d2482e6226e68768, ed007a116f83a834, eb6b0ff9c72fb610, 720917c2882599d8, 5c2ce119cb702899 ...
+        10 IPs, 11 login attempts, 11 sessions, countries: United States, Greece, Mauritius, Poland
+        members: d2482e6226e68768, 6d37ca1f370b0b6e, ed007a116f83a834, 5c2ce119cb702899, 93c0b3c95bcb114f ...
   C-08  Malware payload: sha256:90ad1f172af7d091... served from 2 URL(s): hxxp://107.160.40[.]212/mi3307, hxxp://192.200.208[.]181/mi3307
         2 IPs, 2 login attempts, 5 sessions, countries: United States
         members: ec43dfb3fca33a62, 97b2737d3c1ddd6b

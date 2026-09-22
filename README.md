@@ -14,6 +14,9 @@ The results are written to a **Threat Actor Profile** report, [`evidence/honeypo
 The input is **real attacker traffic**, not made-up data: one day (2019-05-18) of the public, citable [CyberLab honeynet dataset](https://doi.org/10.5281/zenodo.3687527), captured by Cowrie SSH honeypots. It holds 34,772 events, 7,077 login attempts and 180 source IPs.
 
 - **Focus:** threat intelligence, log analysis, attacker profiling
+
+> **Why do the IPs look like `c360572c07b8ca33` instead of `x.x.x.x`?**
+> The dataset authors anonymized every source IP with SHA-256 before publishing it, because IP addresses count as personal data under EU privacy law (GDPR). Each ID always stands for the same real IP, so every count and ranking is exact; only the address itself is hidden. Run the analyzer on your own Cowrie `cowrie.json` and the same report shows normal `x.x.x.x` addresses. The report prints this note too.
 - **Language:** Python 3.8+, **standard library only**
 
 ![Analyzer run](screenshots/02_output.png)

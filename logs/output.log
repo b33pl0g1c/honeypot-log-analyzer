@@ -1,20 +1,22 @@
-2026-09-22 18:15:43 [INFO   ] Honeypot Log Analyzer v1.0
-2026-09-22 18:15:43 [INFO   ] Input : evidence/sample_data.txt
-2026-09-22 18:15:44 [DEBUG  ] Classified 180 actors, 8 campaign clusters
-2026-09-22 18:15:44 [INFO   ] ------------------------------------------------------------------------
-2026-09-22 18:15:44 [INFO   ] Parsed 34,772 lines: 34,772 events, 0 ignored, 0 malformed
-2026-09-22 18:15:44 [INFO   ] 7,077 login attempts from 148 IPs
-2026-09-22 18:15:44 [INFO   ] 
-2026-09-22 18:15:44 [INFO   ] TOP ATTACKING IPs           TOP USERNAMES          TOP PASSWORDS
-2026-09-22 18:15:44 [INFO   ] c360572c07b8ca33 1,888      root           5,064   admin          5,068
-2026-09-22 18:15:44 [INFO   ] ad4147acf400d97f   343      admin            680   <empty>          134
-2026-09-22 18:15:44 [INFO   ] a9741bbf12091b07   335      adm               72   123456            51
-2026-09-22 18:15:44 [INFO   ] ba3a5c03d36d3ad5   282      guest             64   12345             49
-2026-09-22 18:15:44 [INFO   ] 65b8cb085ad96326   247      ftp               63   manager           33
-2026-09-22 18:15:44 [INFO   ] 
-2026-09-22 18:15:44 [WARNING] [ALERT] CRITICAL a1d493f45b7c8fd4 (United States) score 71: MALWARE DROPPER
-2026-09-22 18:15:44 [WARNING] [ALERT] CRITICAL 97b2737d3c1ddd6b (United States) score 70: MALWARE DROPPER
-2026-09-22 18:15:44 [WARNING] [ALERT] CRITICAL ec43dfb3fca33a62 (United States) score 70: MALWARE DROPPER
-2026-09-22 18:15:44 [INFO   ] Severity: CRITICAL 3 | HIGH 28 | MEDIUM 6 | LOW 143
-2026-09-22 18:15:44 [INFO   ] Threat Actor Profile written to evidence/honeypot_analysis.txt
-2026-09-22 18:15:44 [INFO   ] ------------------------------------------------------------------------
+2026-09-22 18:22:29 [INFO   ] Honeypot Log Analyzer v1.0
+2026-09-22 18:22:29 [INFO   ] Input : evidence/sample_data.txt
+2026-09-22 18:22:29 [DEBUG  ] Classified 180 actors, 8 campaign clusters
+2026-09-22 18:22:29 [INFO   ] ------------------------------------------------------------------------
+2026-09-22 18:22:29 [INFO   ] Parsed 34,772 lines: 34,772 events, 0 ignored, 0 malformed
+2026-09-22 18:22:29 [INFO   ] 7,077 login attempts from 148 IPs
+2026-09-22 18:22:29 [INFO   ] 
+2026-09-22 18:22:29 [INFO   ] Note: source IPs are anonymized IDs (SHA-256 by the dataset authors), not x.x.x.x
+2026-09-22 18:22:29 [INFO   ] 
+2026-09-22 18:22:29 [INFO   ] TOP ATTACKING IPs           TOP USERNAMES          TOP PASSWORDS
+2026-09-22 18:22:29 [INFO   ] c360572c07b8ca33 1,888      root           5,064   admin          5,068
+2026-09-22 18:22:29 [INFO   ] ad4147acf400d97f   343      admin            680   <empty>          134
+2026-09-22 18:22:29 [INFO   ] a9741bbf12091b07   335      adm               72   123456            51
+2026-09-22 18:22:29 [INFO   ] ba3a5c03d36d3ad5   282      guest             64   12345             49
+2026-09-22 18:22:29 [INFO   ] 65b8cb085ad96326   247      ftp               63   manager           33
+2026-09-22 18:22:29 [INFO   ] 
+2026-09-22 18:22:29 [WARNING] [ALERT] CRITICAL a1d493f45b7c8fd4 (United States) score 71: MALWARE DROPPER
+2026-09-22 18:22:29 [WARNING] [ALERT] CRITICAL 97b2737d3c1ddd6b (United States) score 70: MALWARE DROPPER
+2026-09-22 18:22:29 [WARNING] [ALERT] CRITICAL ec43dfb3fca33a62 (United States) score 70: MALWARE DROPPER
+2026-09-22 18:22:29 [INFO   ] Severity: CRITICAL 3 | HIGH 28 | MEDIUM 6 | LOW 143
+2026-09-22 18:22:29 [INFO   ] Threat Actor Profile written to evidence/honeypot_analysis.txt
+2026-09-22 18:22:29 [INFO   ] ------------------------------------------------------------------------
