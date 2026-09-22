@@ -1,0 +1,5 @@
+# raw dataset download (1.6 MB, fetch it from Zenodo - see README)
+data_raw/
+__pycache__/
+*.pyc
+.venv/

